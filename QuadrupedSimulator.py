@@ -10,21 +10,35 @@ def ForwardKinematics(legAngles):
 def InGoalRegion(current_cog):
     return False
 
-def getNewJointAngles(init_joint_angles, step_size, total_joints):
+def GetNewJointAngles(init_joint_angles, step_size, total_joints):
     """Generate all combinations of [-step, 0, +step] for each joint"""
     # 16 directions from binary combinations of +/- step per joint
-    new_joint_angles = [0] * len(init_joint_angles)
+    new_joint_angles = [0] * (len(init_joint_angles) * 2)
     i = 0
     while i <= range(init_joint_angles):
         new_joint_angles[i] = -step_size
         i + 1
         new_joint_angles[i] = step_size
         i + 1
-        
+
     return new_joint_angles
 
-def GetCost(current_cog, target_cog):
-    return np.sum((current_cog - target_cog) ** 2)
+def FindMinCostJoint(new_joint_angles, target_cog):
+    """Find the minimum cost out of moving each joint angles and return the minimum cost joint"""
+    cost_vals = [0] * len(new_joint_angles)
+    for i in range(new_joint_angles):
+        current_cog = ForwardKinematics(new_joint_angles[i])
+        cost_vals[i] = GetCost(current_cog, target_cog, new_joint_angles)
+
+    min_cost_index = cost_vals.index(np.min(cost_vals))
+    min_joint = new_joint_angles[min_cost_index]
+
+    return min_joint
+
+def GetCost(current_cog, target_cog, new_joint_angles):
+
+
+    return ((current_cog - target_cog) ** 2)
 
 
 
