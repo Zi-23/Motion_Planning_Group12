@@ -39,18 +39,40 @@ def GetNewJointAngles(init_joint_angles, step_size, total_joints):
 
 def FindMinCostJoint(new_joint_angles, target_cog):
     """Find the minimum cost out of moving each joint angles and return the minimum cost joint"""
+    current_cogs = [0] * len(new_joint_angles)
     cost_vals = [0] * len(new_joint_angles)
+
     for i in range(new_joint_angles):
-        current_cog = ForwardKinematics(new_joint_angles[i])
-        cost_vals[i] = GetCost(current_cog, target_cog, new_joint_angles)
+        current_cogs[i] = ForwardKinematics(new_joint_angles[i])
+        cost_vals[i] = GetCost(current_cogs[i], target_cog)
 
     min_cost_index = cost_vals.index(np.min(cost_vals))
     min_joint = new_joint_angles[min_cost_index]
+    min_cog = current_cogs[min_cost_index]  # center of gravity corresponding to minimum cost movement (for keeping track of COG path)
 
-    return min_joint
+    return min_joint, min_cog
 
-def GetCost(current_cog, target_cog, new_joint_angles):
+def GetCost(current_cog, target_cog):
     return ((current_cog - target_cog) ** 2)
+
+
+# initilize variables
+init_joint_angles = [30, 150, 30, 150, 30, 150, 30, 30]
+step_size = 0.1
+total_joints = len(init_joint_angles)
+target_cog = 0
+min_cog = 1000000
+minimum_cogs = [] # center of gravity logation
+
+while min_cog != target_cog:
+    # Get array of incremented joint angles (2 directions for all joints)
+    new_joint_angles = GetNewJointAngles(init_joint_angles, step_size, total_joints)
+
+    # Get the joint and updated cog location from incremented
+    min_joint, min_cog = FindMinCostJoint(new_joint_angles, target_cog)
+
+    # Add minimum joint and it's corresponding center of gravity to an array to plot
+    minimum_cogs.append(min_cog)
 
 
 
