@@ -15,12 +15,12 @@ def ForwardKinematics(legAngles):
         thetaOne = legAngles[2*i] # Upper joint angle
         thetaTwo = legAngles[2*i+1] # Lower joint angle
 
-        hipPositions.append(L * (cos(thetaOne) * cos(thetaTwo) - sin(thetaOne) * sin(thetaTwo)))
-        hipPositions.append(L * (sin(thetaOne) * cos(thetaTwo) + cos(thetaOne) * sin(thetaTwo)))
+        FeetPositions.append(L * (cos(thetaOne) * cos(thetaTwo) - sin(thetaOne) * sin(thetaTwo)))
+        FeetPositions.append(L * (sin(thetaOne) * cos(thetaTwo) + cos(thetaOne) * sin(thetaTwo)))
 
     # from hips need CoG
 
-    return centerOfGravity
+    return FeetPositions
 
 def InGoalRegion(current_cog):
     return False
