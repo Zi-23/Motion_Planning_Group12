@@ -9,7 +9,7 @@ def ForwardKinematics(legAngles):
     L = 6 # Leg segment length, inches
     bl = 1 # Body length
     bw = 1 # Body width
-    hipPositions = [] # X,Y coords then next hip
+    FeetPositions = [] # X,Y coords then next hip
 
     for i in range(0, 4):
         thetaOne = legAngles[2*i] # Upper joint angle
@@ -22,7 +22,7 @@ def ForwardKinematics(legAngles):
 
     return FeetPositions
 
-def InGoalRegion(current_cog, hipPositions, movingLeg):
+def InGoalRegion(current_cog, FeetPositions, movingLeg):
     """
     Determines if a point is inside a triangle using barycentric coordinates.
 
@@ -35,21 +35,21 @@ def InGoalRegion(current_cog, hipPositions, movingLeg):
     """
     # Get verticies from hip positions depending on which legs we're using
     if movingLeg == 1:
-        v1 = 1
-        v2 = 2
-        v3 = 3
+        v1 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
     elif movingLeg == 2:
-        v1 = 1
-        v2 = 2
-        v3 = 3
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
     elif movingLeg == 3:
-        v1 = 1
-        v2 = 2
-        v3 = 3
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
     elif movingLeg == 4:
-        v1 = 1
-        v2 = 2
-        v3 = 3
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v3 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
     else:
         print("Choose one of the 4 legs that's moving (movingLeg should equal 1 through 4)")
 
@@ -70,11 +70,6 @@ def InGoalRegion(current_cog, hipPositions, movingLeg):
     isInGoalRegion = abs(A - (A1 + A2 + A3)) < 1e-10
 
     return isInGoalRegion
-
-
-
-
-
 
 def GetNewJointAngles(init_joint_angles, step_size, total_joints):
     """Generate all combinations of [-step, 0, +step] for each joint"""
@@ -146,6 +141,7 @@ total_joints = len(init_joint_angles)
 target_cog = 0
 min_cog = 1000000
 minimum_cogs = [] # center of gravity logation
+movingLeg = 1
 
 while min_cog != target_cog:
     # Get array of incremented joint angles (2 directions for all joints)
@@ -158,9 +154,7 @@ while min_cog != target_cog:
     minimum_cogs.append(min_cog)
 
 
-
 # Assume leg one desired, so lift leg four then find intersection of stability between the two
-
 notStable = True
 
 legAngles = [30, 150, 30, 150, 30, 150, 30, 30]
