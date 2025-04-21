@@ -9,7 +9,7 @@ def ForwardKinematics(legAngles):
     L = 6 # Leg segment length, inches
     bl = 1 # Body length
     bw = 1 # Body width
-    hipPositions = [] # X,Y coords then next hip
+    FeetPositions = [] # X,Y coords then next hip
 
     for i in range(0, 4):
         thetaOne = legAngles[2*i] # Upper joint angle
@@ -21,6 +21,19 @@ def ForwardKinematics(legAngles):
     # from hips need CoG
 
     return FeetPositions
+
+def GetCg(FeetPositions):
+
+    FootOne = tuple(FeetPositions[0:2])
+    FootTwo = tuple(FeetPositions[2:4])
+    FootThree = tuple(FeetPositions[4:6])
+    FootFour = tuple(FeetPositions[6:-1])
+
+    # Assume feet one two and three are on the ground and disregard foot four
+
+    Cg = [0,0,0]
+
+    return Cg
 
 def InGoalRegion(current_cog, hipPositions, movingLeg):
     """
