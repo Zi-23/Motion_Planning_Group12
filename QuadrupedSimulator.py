@@ -22,8 +22,68 @@ def ForwardKinematics(legAngles):
 
     return FeetPositions
 
-def InGoalRegion(current_cog):
-    return False
+def InGoalRegion(current_cog, hipPositions, movingLeg):
+    """
+    Determines if a point is inside a triangle using barycentric coordinates.
+
+    Parameters:
+    - pt: tuple (x, y) - the point to check
+    - v1, v2, v3: tuples (x, y) - vertices of the triangle
+
+    Returns:
+    - True if pt is inside the triangle, False otherwise
+    """
+    # Get verticies from hip positions depending on which legs we're using
+    if movingLeg == 1:
+        v1 = 1
+        v2 = 2
+        v3 = 3
+    elif movingLeg == 2:
+        v1 = 1
+        v2 = 2
+        v3 = 3
+    elif movingLeg == 3:
+        v1 = 1
+        v2 = 2
+        v3 = 3
+    elif movingLeg == 4:
+        v1 = 1
+        v2 = 2
+        v3 = 3
+    else:
+        print("Choose one of the 4 legs that's moving (movingLeg should equal 1 through 4)")
+
+    def area(p1, p2, p3):
+        return 0.5 * abs((p1[0] * (p2[1] - p3[1]) +
+                          p2[0] * (p3[1] - p1[1]) +
+                          p3[0] * (p1[1] - p2[1])))
+
+    # Compute total area of triangle
+    A = area(v1, v2, v3)
+
+    # Compute areas of triangles using center of gravity
+    A1 = area(current_cog, v2, v3)
+    A2 = area(v1, current_cog, v3)
+    A3 = area(v1, v2, current_cog)
+
+    # Allow for a small margin of error due to floating point arithmetic
+    isInGoalRegion = abs(A - (A1 + A2 + A3)) < 1e-10
+
+    return isInGoalRegion
+
+# Example usage
+triangle = [(0, 0), (5, 0), (2.5, 5)]
+point = (2.5, 2)
+
+if InGoalRegion(point, *triangle):
+    print("The point is inside the triangle.")
+else:
+    print("The point is outside the triangle.")
+
+
+
+
+
 
 def GetNewJointAngles(init_joint_angles, step_size, total_joints):
     """Generate all combinations of [-step, 0, +step] for each joint"""
