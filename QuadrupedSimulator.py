@@ -6,6 +6,8 @@ import random
 
 def ForwardKinematics(legAngles):
     L = 6 # Leg segment length, inches
+    bl = 1 # Body length
+    bw = 1 # Body width
     hipPositions = [] # X,Y coords then next hip
 
     for i in range(0, 4):
@@ -48,7 +50,6 @@ def FindMinCostJoint(new_joint_angles, target_cog):
     return min_joint
 
 def GetCost(current_cog, target_cog, new_joint_angles):
-
     return ((current_cog - target_cog) ** 2)
 
 
