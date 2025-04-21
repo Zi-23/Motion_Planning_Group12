@@ -37,7 +37,6 @@ def FindMinCostJoint(new_joint_angles, target_cog):
 
 def GetCost(current_cog, target_cog, new_joint_angles):
 
-
     return ((current_cog - target_cog) ** 2)
 
 
