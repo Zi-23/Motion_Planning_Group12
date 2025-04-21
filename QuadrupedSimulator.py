@@ -22,6 +22,12 @@ def ForwardKinematics(legAngles):
 
     return FeetPositions
 
+def GetCg(FeetPositions):
+    
+    Cg = [0,0,0]
+
+    return Cg
+
 def InGoalRegion(current_cog, hipPositions, movingLeg):
     """
     Determines if a point is inside a triangle using barycentric coordinates.
