@@ -5,6 +5,18 @@ import itertools
 import random
 
 def ForwardKinematics(legAngles):
+    L = 6 # Leg segment length, inches
+    hipPositions = [] # X,Y coords then next hip
+
+    for i in range(0, 4):
+        thetaOne = legAngles[2*i] # Upper joint angle
+        thetaTwo = legAngles[2*i+1] # Lower joint angle
+
+        hipPositions.append(L * (cos(thetaOne) * cos(thetaTwo) - sin(thetaOne) * sin(thetaTwo)))
+        hipPositions.append(L * (sin(thetaOne) * cos(thetaTwo) + cos(thetaOne) * sin(thetaTwo)))
+
+    # from hips need CoG
+
     return centerOfGravity
 
 def InGoalRegion(current_cog):
