@@ -71,15 +71,6 @@ def InGoalRegion(current_cog, hipPositions, movingLeg):
 
     return isInGoalRegion
 
-# Example usage
-triangle = [(0, 0), (5, 0), (2.5, 5)]
-point = (2.5, 2)
-
-if InGoalRegion(point, *triangle):
-    print("The point is inside the triangle.")
-else:
-    print("The point is outside the triangle.")
-
 
 
 
