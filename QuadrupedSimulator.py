@@ -56,6 +56,37 @@ def FindMinCostJoint(new_joint_angles, target_cog):
 def GetCost(current_cog, target_cog):
     return ((current_cog - target_cog) ** 2)
 
+# Plot/Return outcome somehow
+
+def PlotPath(minimum_cogs):
+    """
+    Plot the trajectory of the center of gravity over time.
+    Parameters:
+    minimum_cogs: List of cog values (can be 1D or 2D depending on output of ForwardKinematics)
+    """
+    if not minimum_cogs:
+        print("No cog data to plot.")
+        return
+
+    # Check if cog is 2D (x, y) or scalar
+    if isinstance(minimum_cogs[0], (list, tuple, np.ndarray)) and len(minimum_cogs[0]) == 2:
+        xs = [cog[0] for cog in minimum_cogs]
+        ys = [cog[1] for cog in minimum_cogs]
+        plt.plot(xs, ys, marker='o')
+        plt.xlabel("X Position of cog")
+        plt.ylabel("Y Position of cog")
+        plt.title("Center of Gravity Trajectory")
+        plt.grid(True)
+    else:
+        # Scalar cog value case
+        plt.plot(minimum_cogs, marker='o')
+        plt.xlabel("Step")
+        plt.ylabel("CoG (scalar)")
+        plt.title("Center of Gravity Trajectory")
+        plt.grid(True)
+
+    plt.show()
+
 
 # initilize variables
 init_joint_angles = [30, 150, 30, 150, 30, 150, 30, 30]
@@ -122,34 +153,3 @@ while notStable:
     # Test if we made it, exit if yes
     if InGoalRegion(ForwardKinematics(legAngles)):
         notStable = False
-
-# Plot/Return outcome somehow
-
-def plot_path(minimum_cogs):
-    """
-    Plot the trajectory of the center of gravity over time.
-    Parameters:
-    minimum_cogs: List of cog values (can be 1D or 2D depending on output of ForwardKinematics)
-    """
-    if not minimum_cogs:
-        print("No cog data to plot.")
-        return
-
-    # Check if cog is 2D (x, y) or scalar
-    if isinstance(minimum_cogs[0], (list, tuple, np.ndarray)) and len(minimum_cogs[0]) == 2:
-        xs = [cog[0] for cog in minimum_cogs]
-        ys = [cog[1] for cog in minimum_cogs]
-        plt.plot(xs, ys, marker='o')
-        plt.xlabel("X Position of cog")
-        plt.ylabel("Y Position of cog")
-        plt.title("Center of Gravity Trajectory")
-        plt.grid(True)
-    else:
-        # Scalar cog value case
-        plt.plot(minimum_cogs, marker='o')
-        plt.xlabel("Step")
-        plt.ylabel("CoG (scalar)")
-        plt.title("Center of Gravity Trajectory")
-        plt.grid(True)
-
-    plt.show()
