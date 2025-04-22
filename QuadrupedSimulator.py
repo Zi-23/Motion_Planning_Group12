@@ -89,7 +89,7 @@ def GetNewJointAngles(init_joint_angles, step_size, total_joints):
     # 16 directions from binary combinations of +/- step per joint
     new_joint_angles = [0] * (len(init_joint_angles) * 2)
     i = 0
-    while i <= range(init_joint_angles):
+    while i <= len(init_joint_angles):
         new_joint_angles[i] = -step_size
         i + 1
         new_joint_angles[i] = step_size
