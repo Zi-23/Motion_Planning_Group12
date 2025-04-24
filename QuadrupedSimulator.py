@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 import random
+import math
 
 def ForwardKinematics(legAngles):
     L = 6 # Leg segment length, inches
@@ -24,6 +25,9 @@ def ForwardKinematics(legAngles):
 
 def GetCg(FeetPositions):
 
+    FrontWidth = 1
+    SideLength = 2
+
     FootOne = tuple(FeetPositions[0:2])
     FootTwo = tuple(FeetPositions[2:4])
     FootThree = tuple(FeetPositions[4:6])
@@ -31,9 +35,63 @@ def GetCg(FeetPositions):
 
     # Assume feet one two and three are on the ground and disregard foot four
 
-    Cg = [0,0,0]
+    # Inital location in base frame of feet [x,y,z] (this test case is with the legs straight down)
 
-    return Cg
+    FootOneInit = [0,0,0]
+    FootTwoInit = [SideLength,0,0]
+    FootThreeInit = [SideLength,FrontWidth,0]
+
+    FrontWidth = 1
+    SideLength = 2
+
+    Theta1 = np.arctan((FootOne[1] - FootTwo[1]) / (SideLength - FootOne[0] + FootTwo[0]))
+
+    Hip = tuple([0,0])
+
+    L1 = math.dist(Hip,FootOne)
+    L2 = math.dist(Hip,FootTwo)
+    L3 = math.dist(Hip,FootThree)
+
+    Alpha1 = np.arcsin(FootOne[0]/L1)
+    Alpha2 = np.arcsin(FootTwo[0]/L2)
+    Alpha3 = np.arcsin(FootThree[0]/L3)
+
+    d1 = L1*np.cos(Theta1 - Alpha1)
+    d2 = L2*np.cos(Theta1 - Alpha2)
+    d3 = L3*np.cos(Theta1 - Alpha3)
+
+    a1 = L1*np.sin(Theta1 - Alpha1)
+    a2 = L2*np.sin(Theta1 - Alpha2)
+    a3 = L3*np.sin(Theta1 - Alpha3)
+
+    Theta2 = np.arctan((d2-d3)/FrontWidth)
+
+    b1 = d1*np.sin(Theta2)
+    b2 = d2*np.sin(Theta2)
+    b3 = d3*np.sin(Theta2)
+
+    c1 = d1*np.cos(Theta2)
+    c2 = d2*np.cos(Theta2)
+    c3 = d3*np.cos(Theta2)
+
+    HipOne = [FootOneInit[0] + a1, FootOneInit[1] + b1, FootOneInit[2] + c1]
+    HipTwo = [FootTwoInit[0] + a2, FootTwoInit[1] + b2, FootTwoInit[2] + c2]
+    HipThree = [FootThreeInit[0] + a3, FootThreeInit[1] + b3, FootThreeInit[2] + c3]
+
+    v1 = GetUnitVector(HipTwo,HipOne)
+    v2 = GetUnitVector(HipTwo,HipThree)
+
+    CenterOfGravity = [HipTwo + v1*0.5*SideLength + v2*0.5*FrontWidth]
+
+    return CenterOfGravity
+
+def GetUnitVector(p1,p2):
+
+    vector = (p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2])
+    magnitude = np.sqrt(vector[0]**2 + vector[1]**2 + vector[2]**2)
+    UnitVector = vector/magnitude
+
+    return UnitVector
 
 def InGoalRegion(current_cog, FeetPositions, movingLeg):
     """
