@@ -1,5 +1,3 @@
-# test push
-# Jordan testing pushing
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
@@ -16,12 +14,45 @@ def ForwardKinematics(legAngles):
         thetaOne = legAngles[2*i] # Upper joint angle
         thetaTwo = legAngles[2*i+1] # Lower joint angle
 
-        FeetPositions.append(L * (cos(thetaOne) * cos(thetaTwo) - sin(thetaOne) * sin(thetaTwo)))
-        FeetPositions.append(L * (sin(thetaOne) * cos(thetaTwo) + cos(thetaOne) * sin(thetaTwo)))
+        FeetPositions.append(L * (np.cos(np.deg2rad(thetaOne)) * np.cos(np.deg2rad(thetaTwo)) - np.sin(np.deg2rad(thetaOne)) * np.sin(np.deg2rad(thetaTwo))))
+        FeetPositions.append(L * (np.sin(np.deg2rad(thetaOne)) * np.cos(np.deg2rad(thetaTwo)) + np.cos(np.deg2rad(thetaOne)) * np.sin(np.deg2rad(thetaTwo))))
 
     # from hips need CoG
 
     return FeetPositions
+
+def GetTargetCg(FeetPositions, movingLeg):
+    """
+    Calculate the centroid (center) of the support polygon (triangle) given three vertices. These vertices depend on which foot is moving.
+    Returns:
+        A tuple (x_center, y_center) representing the centroid of the triangle.
+    """
+    # Get vertices from hip positions depending on which legs we're using
+    if movingLeg == 1:
+        v1 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+    elif movingLeg == 2:
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+    elif movingLeg == 3:
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+    elif movingLeg == 4:
+        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
+        v3 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+    else:
+        print("Choose one of the 4 legs that's moving (movingLeg should equal 1 through 4)")
+
+    # Compute the center of the support polygon
+    x_center = (v1[0] + v2[0] + v3[0]) / 3
+    y_center = (v1[1] + v2[1] + v3[1]) / 3
+    target_cog = (x_center, y_center)
+
+    return target_cog
 
 def GetCg(FeetPositions):
 
@@ -104,7 +135,7 @@ def InGoalRegion(current_cog, FeetPositions, movingLeg):
     Returns:
     - True if pt is inside the triangle, False otherwise
     """
-    # Get verticies from hip positions depending on which legs we're using
+    # Get vertices from hip positions depending on which legs we're using
     if movingLeg == 1:
         v1 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
         v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
@@ -145,23 +176,32 @@ def InGoalRegion(current_cog, FeetPositions, movingLeg):
 def GetNewJointAngles(init_joint_angles, step_size, total_joints):
     """Generate all combinations of [-step, 0, +step] for each joint"""
     # 16 directions from binary combinations of +/- step per joint
-    new_joint_angles = [0] * (len(init_joint_angles) * 2)
+
+    new_joint_angles = [0] * (len(init_joint_angles) * 2)  # Use for creating a normal array below
+    # new_joint_angles = [0] * len(init_joint_angles)  # Use for creating an array of tuples below
+
     i = 0
-    while i <= len(init_joint_angles):
-        new_joint_angles[i] = -step_size
-        i + 1
-        new_joint_angles[i] = step_size
-        i + 1
+    while i < len(init_joint_angles):
+        # Create an array of joint angles [angle[i]-step_size, angle[i]+step_size, ...]
+        new_joint_angles[2*i] = init_joint_angles[i] - step_size
+        new_joint_angles[2*i+1] = init_joint_angles[i] + step_size
+        i = i + 1
+        
+        # # Create an array of tuples (angle-step_size, angle+step_size)
+        # new_joint_angles[i] = (init_joint_angles[i] - step_size, init_joint_angles[i] + step_size)
+        # i = i + 1
 
     return new_joint_angles
 
 def FindMinCostJoint(new_joint_angles, target_cog):
     """Find the minimum cost out of moving each joint angles and return the minimum cost joint"""
+    feetPositions = [0] * len(new_joint_angles)
     current_cogs = [0] * len(new_joint_angles)
     cost_vals = [0] * len(new_joint_angles)
 
-    for i in range(new_joint_angles):
-        current_cogs[i] = ForwardKinematics(new_joint_angles[i])
+    for i in range(0, len(new_joint_angles)):
+        feetPositions = ForwardKinematics(new_joint_angles[i])
+        current_cogs[i] = GetCg(feetPositions)
         cost_vals[i] = GetCost(current_cogs[i], target_cog)
 
     min_cost_index = cost_vals.index(np.min(cost_vals))
@@ -212,61 +252,73 @@ total_joints = len(init_joint_angles)
 target_cog = 0
 min_cog = 1000000
 minimum_cogs = [] # center of gravity logation
+movingLeg = 1
+movingToTargetCG = True
 
-while min_cog != target_cog:
+# Compute target_cog using initial joint angles
+initFeetPositions = ForwardKinematics(init_joint_angles)
+target_cog = GetTargetCg(initFeetPositions, movingLeg)
+print("\nThe target COG is: ", target_cog, "\n")
+
+while movingToTargetCG == True:
     # Get array of incremented joint angles (2 directions for all joints)
     new_joint_angles = GetNewJointAngles(init_joint_angles, step_size, total_joints)
+    print("New Joint Angles: ", new_joint_angles, "\n")
 
     # Get the joint and updated cog location from incremented
     min_joint, min_cog = FindMinCostJoint(new_joint_angles, target_cog)
+    print("Min COG: ", min_cog, "\n")
 
     # Add minimum joint and it's corresponding center of gravity to an array to plot
     minimum_cogs.append(min_cog)
 
+    if target_cog - 1 < min_cog and min_cog < target_cog + 1:
+        movingToTargetCG = False
 
+PlotPath(minimum_cogs)
 
-# Assume leg one desired, so lift leg four then find intersection of stability between the two
+# # Assume leg one desired, so lift leg four then find intersection of stability between the two
 
-notStable = True
+# notStable = True
 
-legAngles = [30, 150, 30, 150, 30, 150, 30, 30]
-testAngles = legAngles
-costToGo = 0.0
+# legAngles = [30, 150, 30, 150, 30, 150, 30, 30]
+# testAngles = legAngles
+# costToGo = 0.0
 
-anglePath = []
+# anglePath = []
 
-while notStable:
-    # Compare how each perturbance affects the cost
-    bestAngleIndex = 0
-    bestCost = 10000000
-    bestDirection = 0
+# while notStable:
+#     # Compare how each perturbance affects the cost
+#     bestAngleIndex = 0
+#     bestCost = 10000000
+#     bestDirection = 0
 
-    for idx in range(0,6): # For each joint angle...
-        for j in range(0,2): # For each direction...
-            testLegAngles = legAngles
-            if j == 0:
-                testLegAngles[idx] = testLegAngles + epsilon
-            else:
-                testLegAngles[idx] = testLegAngles - epsilon
+#     for idx in range(0,6): # For each joint angle...
+#         for j in range(0,2): # For each direction...
+#             testLegAngles = legAngles
+#             if j == 0:
+#                 testLegAngles[idx] = testLegAngles + epsilon
+#             else:
+#                 testLegAngles[idx] = testLegAngles - epsilon
 
-            centerOfGravity = ForwardKinematics(testLegAngles)
-            testCost = GetCost(centerOfGravity)
+#             centerOfGravity = ForwardKinematics(testLegAngles)
+#             testCost = GetCost(centerOfGravity)
 
-            if testCost < bestCost:
-                bestCost = testCost
-                bestAngleIndex = idx
-                bestDirection = j
+#             if testCost < bestCost:
+#                 bestCost = testCost
+#                 bestAngleIndex = idx
+#                 bestDirection = j
 
-    # Update with the best values
-    if bestDirection == 0:
-        legAngles[bestAngleIndex] = testLegAngles + epsilon
-    else:
-        legAngles[bestAngleIndex] = testLegAngles - epsilon
-    costToGo += bestCost
+#     # Update with the best values
+#     if bestDirection == 0:
+#         legAngles[bestAngleIndex] = testLegAngles + epsilon
+#     else:
+#         legAngles[bestAngleIndex] = testLegAngles - epsilon
+#     costToGo += bestCost
 
-    # Log it [NewAngle, AngleIndex, CenterOfGravity]
-    anglePath.append([legAngles[bestAngleIndex], bestAngleIndex, ForwardKinematics(legAngles)])
+#     # Log it [NewAngle, AngleIndex, CenterOfGravity]
+#     anglePath.append([legAngles[bestAngleIndex], bestAngleIndex, ForwardKinematics(legAngles)])
 
-    # Test if we made it, exit if yes
-    if InGoalRegion(ForwardKinematics(legAngles)):
-        notStable = False
+#     # Test if we made it, exit if yes
+#     if InGoalRegion(ForwardKinematics(legAngles)):
+#         notStable = False
