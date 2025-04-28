@@ -21,7 +21,7 @@
 
 ## Results
 ### Threshold = 1
-![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/895ce2a9f00716a7a2e42dff2a2df886daa95509/COG_Plot_Threshold_1.png?raw=true)
+![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/ea71bf7befedcb01c6833589b85e1c8d2b6aa8ee/COG_Plot_Threshold_1.png?raw=true)
 
 ### Threshold = 0.01
-![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/895ce2a9f00716a7a2e42dff2a2df886daa95509/COG_Plot_Threshold_0_01.png?raw=true)
+![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/ea71bf7befedcb01c6833589b85e1c8d2b6aa8ee/COG_Plot_Threshold_0_01.png?raw=true)
