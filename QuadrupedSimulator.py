@@ -290,7 +290,7 @@ threshold = 1
 initFeetPositions = ForwardKinematics(joint_angles)
 
 target_cog = GetTargetCg(initFeetPositions, movingLeg)
-plotter2d(initFeetPositions, movingLeg, target_cog)
+plotter2d(movingLeg, target_cog)
 
 print("\nThe target COG is: ", target_cog, "\n")
 
