@@ -111,7 +111,7 @@ def GetCg(FeetPositions):
     v1 = GetUnitVector(HipTwo,HipOne)
     v2 = GetUnitVector(HipTwo,HipThree)
 
-    CenterOfGravity = [HipTwo + v1*0.5*SideLength + v2*0.5*FrontWidth]
+    CenterOfGravity = [HipTwo + v1*0.25*SideLength + v2*0.5*FrontWidth]
 
     return CenterOfGravity
 
