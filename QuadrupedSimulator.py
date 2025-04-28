@@ -1,14 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
-import random
 import math
 
+_ROBOT_WIDTH = 8 # inches
+_ROBOT_LENGTH = 15
+
 def ForwardKinematics(legAngles):
+    # Given angles of the leg, assuming the feet are all in contact with
+    # the ground, returns the feet positions relative to each hip's frame
     L = 6 # Leg segment length, inches
-    bl = 1 # Body length
-    bw = 1 # Body width
-    FeetPositions = [] # X,Y coords then next hip
+    bl = _ROBOT_LENGTH # Body length, inches
+    bw = _ROBOT_WIDTH # Body width, inches
+    FeetPositions = [] # X,Y coords then next foot
 
     for i in range(0, 4):
         thetaOne = legAngles[2*i] # Upper joint angle
@@ -16,8 +20,6 @@ def ForwardKinematics(legAngles):
 
         FeetPositions.append(L * (np.cos(np.deg2rad(thetaOne)) * np.cos(np.deg2rad(thetaTwo)) - np.sin(np.deg2rad(thetaOne)) * np.sin(np.deg2rad(thetaTwo))))
         FeetPositions.append(L * (np.sin(np.deg2rad(thetaOne)) * np.cos(np.deg2rad(thetaTwo)) + np.cos(np.deg2rad(thetaOne)) * np.sin(np.deg2rad(thetaTwo))))
-
-    # from hips need CoG
 
     return FeetPositions
 
@@ -56,8 +58,8 @@ def GetTargetCg(FeetPositions, movingLeg):
 
 def GetCg(FeetPositions):
 
-    FrontWidth = 1
-    SideLength = 2
+    FrontWidth = _ROBOT_WIDTH
+    SideLength = _ROBOT_LENGTH
 
     FootOne = tuple(FeetPositions[0:2])
     FootTwo = tuple(FeetPositions[2:4])
@@ -71,9 +73,6 @@ def GetCg(FeetPositions):
     FootOneInit = [0,0,0]
     FootTwoInit = [SideLength,0,0]
     FootThreeInit = [SideLength,FrontWidth,0]
-
-    FrontWidth = 1
-    SideLength = 2
 
     Theta1 = np.arctan((FootOne[1] - FootTwo[1]) / (SideLength - FootOne[0] + FootTwo[0]))
 
@@ -186,34 +185,63 @@ def GetNewJointAngles(init_joint_angles, step_size, total_joints):
         new_joint_angles[2*i] = init_joint_angles[i] - step_size
         new_joint_angles[2*i+1] = init_joint_angles[i] + step_size
         i = i + 1
-        
+
         # # Create an array of tuples (angle-step_size, angle+step_size)
         # new_joint_angles[i] = (init_joint_angles[i] - step_size, init_joint_angles[i] + step_size)
         # i = i + 1
 
     return new_joint_angles
 
-def FindMinCostJoint(new_joint_angles, target_cog):
+def FindMinCostJoint(new_joint_angles, target_cog, current_joint_angles):
     """Find the minimum cost out of moving each joint angles and return the minimum cost joint"""
     feetPositions = [0] * len(new_joint_angles)
     current_cogs = [0] * len(new_joint_angles)
     cost_vals = [0] * len(new_joint_angles)
+    test_indicies = [0] * len(new_joint_angles)
 
-    for i in range(0, len(new_joint_angles)):
-        feetPositions = ForwardKinematics(new_joint_angles[i])
-        current_cogs[i] = GetCg(feetPositions)
-        cost_vals[i] = GetCost(current_cogs[i], target_cog)
+    for idx, i in enumerate(new_joint_angles):
+        test_joint_angles = current_joint_angles
 
+        # Update each joint with the associated angle to test
+        if idx == 0 or idx == 1:
+            test_joint_angles[0] = i
+            test_indicies[idx] = 0
+        elif idx == 2 or idx == 3:
+            test_joint_angles[1] = i
+            test_indicies[idx] = 1
+        elif idx == 4 or idx == 5:
+            test_joint_angles[2] = i
+            test_indicies[idx] = 2
+        elif idx == 6 or idx == 7:
+            test_joint_angles[3] = i
+            test_indicies[idx] = 3
+        elif idx == 8 or idx == 9:
+            test_joint_angles[4] = i
+            test_indicies[idx] = 4
+        elif idx == 10 or idx == 11:
+            test_joint_angles[5] = i
+            test_indicies[idx] = 5
+        elif idx == 12 or idx == 13:
+            test_joint_angles[6] = i
+            test_indicies[idx] = 6
+        elif idx == 14 or idx == 15:
+            test_joint_angles[7] = i
+            test_indicies[idx] = 7
+
+        feetPositions = ForwardKinematics(test_joint_angles)
+        unprojected_cg = GetCg(feetPositions)
+        current_cogs[idx] = [unprojected_cg[0][0], unprojected_cg[0][1]] # Assuming that it is of the from x,y,z
+        cost_vals[idx] = GetCost(current_cogs[idx], target_cog)
+
+    # Need to log which joint is improving the cost so we update that one too
     min_cost_index = cost_vals.index(np.min(cost_vals))
     min_joint = new_joint_angles[min_cost_index]
     min_cog = current_cogs[min_cost_index]  # center of gravity corresponding to minimum cost movement (for keeping track of COG path)
 
-    return min_joint, min_cog
+    return min_joint, test_indicies[min_cost_index], min_cog
 
 def GetCost(current_cog, target_cog):
-    return ((current_cog - target_cog) ** 2)
-
-# Plot/Return outcome somehow
+    return np.linalg.norm(np.array(current_cog) - np.array(target_cog))
 
 def PlotPath(minimum_cogs):
     """
@@ -246,33 +274,37 @@ def PlotPath(minimum_cogs):
 
 
 # initilize variables
-init_joint_angles = [30, 150, 30, 150, 30, 150, 30, 30]
-step_size = 0.1
-total_joints = len(init_joint_angles)
+joint_angles = [30, 150, 30, 150, 30, 150, 30, 150] # Corresponds to a neutral standing position
+step_size = 0.01 # Amount to perturb the joints at a given step
+total_joints = len(joint_angles)
 target_cog = 0
 min_cog = 1000000
-minimum_cogs = [] # center of gravity logation
+minimum_cogs = [] # center of gravity location
 movingLeg = 1
 movingToTargetCG = True
 
 # Compute target_cog using initial joint angles
-initFeetPositions = ForwardKinematics(init_joint_angles)
+initFeetPositions = ForwardKinematics(joint_angles)
 target_cog = GetTargetCg(initFeetPositions, movingLeg)
 print("\nThe target COG is: ", target_cog, "\n")
 
 while movingToTargetCG == True:
     # Get array of incremented joint angles (2 directions for all joints)
-    new_joint_angles = GetNewJointAngles(init_joint_angles, step_size, total_joints)
+    new_joint_angles = GetNewJointAngles(joint_angles, step_size, total_joints)
     print("New Joint Angles: ", new_joint_angles, "\n")
 
-    # Get the joint and updated cog location from incremented
-    min_joint, min_cog = FindMinCostJoint(new_joint_angles, target_cog)
+    # Test each move to see which results in the most improvement; return that one
+    min_joint, min_joint_index, min_cog = FindMinCostJoint(new_joint_angles, target_cog, joint_angles)
     print("Min COG: ", min_cog, "\n")
+    print("Vs Target: ", target_cog, "\n")
 
-    # Add minimum joint and it's corresponding center of gravity to an array to plot
+    # Add new minimum center of gravity to an array for future plotting
     minimum_cogs.append(min_cog)
 
-    if target_cog - 1 < min_cog and min_cog < target_cog + 1:
+    # Update the current position so we actually go somewhere
+    joint_angles[min_joint_index] = min_joint
+
+    if target_cog[0] - 1 < min_cog[0] and min_cog[0] < target_cog[0] + 1 and target_cog[1] - 1 < min_cog[1] and min_cog[1] < target_cog[1] + 1:
         movingToTargetCG = False
 
 PlotPath(minimum_cogs)
@@ -303,7 +335,7 @@ PlotPath(minimum_cogs)
 
 #             centerOfGravity = ForwardKinematics(testLegAngles)
 #             testCost = GetCost(centerOfGravity)
-
+#     WHY DID WE REWRITE ALL THIS
 #             if testCost < bestCost:
 #                 bestCost = testCost
 #                 bestAngleIndex = idx
