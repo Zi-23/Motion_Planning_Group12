@@ -244,7 +244,7 @@ def FindMinCostJoint(new_joint_angles, target_cog, current_joint_angles):
 def GetCost(current_cog, target_cog):
     return np.linalg.norm(np.array(current_cog) - np.array(target_cog))
 
-def PlotPath(minimum_cogs):
+def PlotPath(minimum_cogs, target_cog):
     """
     Plot the trajectory of the center of gravity over time.
     Parameters:
@@ -263,6 +263,7 @@ def PlotPath(minimum_cogs):
         plt.ylabel("Y Position of cog")
         plt.title("Center of Gravity Trajectory")
         plt.grid(True)
+        plt.plot(target_cog[0], target_cog[1], 'go', markersize=7, linewidth=2)
     else:
         # Scalar cog value case
         plt.plot(minimum_cogs, marker='o')
@@ -290,7 +291,7 @@ threshold = 0.01
 initFeetPositions = ForwardKinematics(joint_angles)
 
 target_cog = GetTargetCg(initFeetPositions, movingLeg)
-plotter2d(movingLeg, target_cog)
+plotter2d(movingLeg)
 
 print("\nThe target COG is: ", target_cog, "\n")
 
@@ -301,9 +302,8 @@ while movingToTargetCG == True:
 
     # Test each move to see which results in the most improvement; return that one
     min_joint, min_joint_index, min_cog = FindMinCostJoint(new_joint_angles, target_cog, joint_angles)
-    plotCoG(min_cog)
-    print("Min COG: ", min_cog)
-    print("Vs Target: ", target_cog, "\n")
+    plotCoG(min_cog, target_cog)
+    # print("Min COG: ", min_cog)
 
     # Update the current position so we actually go somewhere
     joint_angles[min_joint_index] = min_joint
@@ -315,50 +315,6 @@ while movingToTargetCG == True:
     if target_cog[0] - threshold < min_cog[0] and min_cog[0] < target_cog[0] + threshold and target_cog[1] - threshold < min_cog[1] and min_cog[1] < target_cog[1] + threshold:
         movingToTargetCG = False
 
-PlotPath(minimum_cogs)
-
-# # Assume leg one desired, so lift leg four then find intersection of stability between the two
-
-# notStable = True
-
-# legAngles = [30, 150, 30, 150, 30, 150, 30, 30]
-# testAngles = legAngles
-# costToGo = 0.0
-
-# anglePath = []
-
-# while notStable:
-#     # Compare how each perturbance affects the cost
-#     bestAngleIndex = 0
-#     bestCost = 10000000
-#     bestDirection = 0
-
-#     for idx in range(0,6): # For each joint angle...
-#         for j in range(0,2): # For each direction...
-#             testLegAngles = legAngles
-#             if j == 0:
-#                 testLegAngles[idx] = testLegAngles + epsilon
-#             else:
-#                 testLegAngles[idx] = testLegAngles - epsilon
-
-#             centerOfGravity = ForwardKinematics(testLegAngles)
-#             testCost = GetCost(centerOfGravity)
-#     WHY DID WE REWRITE ALL THIS
-#             if testCost < bestCost:
-#                 bestCost = testCost
-#                 bestAngleIndex = idx
-#                 bestDirection = j
-
-#     # Update with the best values
-#     if bestDirection == 0:
-#         legAngles[bestAngleIndex] = testLegAngles + epsilon
-#     else:
-#         legAngles[bestAngleIndex] = testLegAngles - epsilon
-#     costToGo += bestCost
-
-#     # Log it [NewAngle, AngleIndex, CenterOfGravity]
-#     anglePath.append([legAngles[bestAngleIndex], bestAngleIndex, ForwardKinematics(legAngles)])
-
-#     # Test if we made it, exit if yes
-#     if InGoalRegion(ForwardKinematics(legAngles)):
-#         notStable = False
+# print(minimum_cogs)
+print(len(minimum_cogs))
+PlotPath(minimum_cogs, target_cog)

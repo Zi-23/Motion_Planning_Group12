@@ -6,13 +6,14 @@ import math
 
 CoG_i = []
 
-def plotter2d(movingLeg, target_cog):
+def plotter2d(movingLeg):
     ## plots the legs and target center of gravity
     plt.figure()
     plt.grid(True)
     plt.axis('equal')
 
-    FeetPositions = [(30, 0), (30, 8), (0, 8), (0, 0)]
+    # FeetPositions = [(30+2.17, 0), (30+2.17, 8), (-2.17, 8), (-2.17, 0)]
+    FeetPositions = [(30+7, -1), (30+7, 9), (-7, 9), (-7, -1)]
 
     for i in range(4):
         plt.plot(FeetPositions[i][0], FeetPositions[i][1], 'ko', markersize=8, markerfacecolor='k')
@@ -22,13 +23,12 @@ def plotter2d(movingLeg, target_cog):
 
     plt.fill(supportFeet[:,0], supportFeet[:,1], 'c', alpha=0.3, edgecolor='none')
 
-    plt.plot(target_cog[0], target_cog[1], 'go', markersize=7, linewidth=2)
-
     plt.title('Stability Region vs Center of Gravity')
 
-def plotCoG(CoG):
+def plotCoG(CoG, target_cog):
     ## add new CoG to Plot
     plt.plot(CoG[0], CoG[1], 'ro', markersize=5)
+    plt.plot(target_cog[0], target_cog[1], 'go', markersize=7, linewidth=2)
     CoG_i.append(CoG)
 
 def plandrw():
