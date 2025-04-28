@@ -15,7 +15,7 @@ def plotter2d(movingLeg, target_cog):
     FeetPositions = [(0, 0), (15, 0), (5, 8), (8, 0)]
 
     for i in range(4):
-        plt.plot(FeetPositions[i,0], FeetPositions[i,1], 'ko', markersize=8, markerfacecolor='k')
+        plt.plot(FeetPositions[i][0], FeetPositions[i][1], 'ko', markersize=8, markerfacecolor='k')
 
     support_legs = [i for i in range(4) if (i+1) != movingLeg]
     supportFeet = np.array(FeetPositions)[support_legs, :]
