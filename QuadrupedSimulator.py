@@ -282,6 +282,7 @@ min_cog = 1000000
 minimum_cogs = [] # center of gravity location
 movingLeg = 1
 movingToTargetCG = True
+threshold = 1
 
 # Compute target_cog using initial joint angles
 initFeetPositions = ForwardKinematics(joint_angles)
@@ -308,7 +309,7 @@ while movingToTargetCG == True:
     # Update the current position so we actually go somewhere
     joint_angles[min_joint_index] = min_joint
 
-    if target_cog[0] - 1 < min_cog[0] and min_cog[0] < target_cog[0] + 1 and target_cog[1] - 1 < min_cog[1] and min_cog[1] < target_cog[1] + 1:
+    if target_cog[0] - threshold < min_cog[0] and min_cog[0] < target_cog[0] + threshold and target_cog[1] - threshold < min_cog[1] and min_cog[1] < target_cog[1] + threshold:
         movingToTargetCG = False
 
 PlotPath(minimum_cogs)
