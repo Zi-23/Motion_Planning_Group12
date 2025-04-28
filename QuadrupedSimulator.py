@@ -280,6 +280,7 @@ total_joints = len(joint_angles)
 target_cog = 0
 min_cog = 1000000
 minimum_cogs = [] # center of gravity location
+leg_positions = [] # set of leg positions
 movingLeg = 1
 movingToTargetCG = True
 threshold = 1
@@ -301,11 +302,12 @@ while movingToTargetCG == True:
     print("Min COG: ", min_cog, "\n")
     print("Vs Target: ", target_cog, "\n")
 
-    # Add new minimum center of gravity to an array for future plotting
-    minimum_cogs.append(min_cog)
-
     # Update the current position so we actually go somewhere
     joint_angles[min_joint_index] = min_joint
+    
+    # Add new minimum center of gravity, associated leg positions to an array for future plotting
+    minimum_cogs.append(min_cog)
+    leg_positions.append(joint_angles)
 
     if target_cog[0] - threshold < min_cog[0] and min_cog[0] < target_cog[0] + threshold and target_cog[1] - threshold < min_cog[1] and min_cog[1] < target_cog[1] + threshold:
         movingToTargetCG = False
