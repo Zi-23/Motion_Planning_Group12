@@ -33,10 +33,9 @@ def plotCoG(CoG):
 
 def plandrw(index):
     ## adds lines for the cogs for the final path
-    for i in range(len(index) - 1):
-        p_1 = CoG_i[index[i]]
-        p_2 = CoG_i[index[i+1]]
-
+    for i in range(CoG_i - 1):
+        p_1 = CoG_i[i]]
+        p_2 = CoG_i[CoG_i+1]]
         plt.plot([p_1[0], p_2[0]], [p_1[1], p_2[1]], 'g-', linewidth=1)
         plt.plot(p_1[0], p_1[1], 'o', markersize=6, markeredgecolor='g', markerfacecolor='none')
     plt.plot(p_2[0], p_2[1], 'o', markersize=6, markeredgecolor='g', markerfacecolor='none')
