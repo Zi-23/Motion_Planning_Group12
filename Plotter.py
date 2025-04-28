@@ -6,17 +6,13 @@ import math
 
 CoG_i = []
 
-def plotter2d(FeetPositions, movingLeg, target_cog):
+def plotter2d(movingLeg, target_cog):
     ## plots the legs and target center of gravity
     plt.figure()
     plt.grid(True)
     plt.axis('equal')
 
-    FeetPositions = np.array(FeetPositions).reshape(4,2)
-    FeetPositions[1, 0] += 8 
-    FeetPositions[2, 0] += 8 
-    FeetPositions[2, 1] += 15 
-    FeetPositions[3, 1] += 15  
+    Feet Positions[[0, 0], [15, 0], [15, 8], [8, 0]]
 
     for i in range(4):
         plt.plot(FeetPositions[i,0], FeetPositions[i,1], 'ko', markersize=8, markerfacecolor='k')
