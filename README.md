@@ -8,6 +8,9 @@
 &emsp; - Nathan Fuller\
 &emsp; - Zi Wang
 
+## Algorithm Flowchart
+![alt text](https://github.com/argonraver/Motion_Planning_Group12/blob/main/AlgorithmFlowchart.png?raw=true)
+
 ## Gradient Descent
 &emsp; - Increment joint angles in both directions to get 16 cases\
 &emsp; - Iterate (sample) new joint angles (all 16 cases)\
