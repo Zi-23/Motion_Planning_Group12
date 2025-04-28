@@ -302,7 +302,7 @@ while movingToTargetCG == True:
     # Test each move to see which results in the most improvement; return that one
     min_joint, min_joint_index, min_cog = FindMinCostJoint(new_joint_angles, target_cog, joint_angles)
     plotCoG(min_cog)
-    print("Min COG: ", min_cog, "\n")
+    print("Min COG: ", min_cog)
     print("Vs Target: ", target_cog, "\n")
 
     # Update the current position so we actually go somewhere
