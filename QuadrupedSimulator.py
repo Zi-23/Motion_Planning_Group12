@@ -275,7 +275,7 @@ def PlotPath(minimum_cogs):
 
 # initilize variables
 joint_angles = [30, 150, 30, 150, 30, 150, 30, 150] # Corresponds to a neutral standing position
-step_size = 0.01 # Amount to perturb the joints at a given step
+step_size = 0.1 # Amount to perturb the joints at a given step
 total_joints = len(joint_angles)
 target_cog = 0
 min_cog = 1000000
@@ -285,13 +285,17 @@ movingToTargetCG = True
 
 # Compute target_cog using initial joint angles
 initFeetPositions = ForwardKinematics(joint_angles)
-target_cog = GetTargetCg(initFeetPositions, movingLeg)
+
+# This function not currently working; what frame is it in?
+#target_cog = GetTargetCg(initFeetPositions, movingLeg)
+target_cog = (6.0, 3.0)
+
 print("\nThe target COG is: ", target_cog, "\n")
 
 while movingToTargetCG == True:
     # Get array of incremented joint angles (2 directions for all joints)
     new_joint_angles = GetNewJointAngles(joint_angles, step_size, total_joints)
-    print("New Joint Angles: ", new_joint_angles, "\n")
+    #print("New Joint Angles: ", new_joint_angles, "\n")
 
     # Test each move to see which results in the most improvement; return that one
     min_joint, min_joint_index, min_cog = FindMinCostJoint(new_joint_angles, target_cog, joint_angles)
