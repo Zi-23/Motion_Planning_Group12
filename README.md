@@ -9,7 +9,7 @@
 &emsp; - Zi Wang
 
 ## Algorithm Flowchart
-![alt text](https://github.com/argonraver/Motion_Planning_Group12/blob/main/AlgorithmFlowchart.png?raw=true)
+![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/895ce2a9f00716a7a2e42dff2a2df886daa95509/AlgorithmFlowchart.png?raw=true)
 
 ## Gradient Descent
 &emsp; - Increment joint angles in both directions to get 16 cases\
