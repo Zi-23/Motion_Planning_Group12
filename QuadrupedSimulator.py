@@ -31,21 +31,21 @@ def GetTargetCg(FeetPositions, movingLeg):
     """
     # Get vertices from hip positions depending on which legs we're using
     if movingLeg == 1:
-        v1 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
-        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
-        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+        v1 = (FeetPositions[2], _ROBOT_WIDTH) # Leg 2 tuple (x, y)
+        v2 = (_ROBOT_LENGTH + FeetPositions[4], 0) # Leg 3 tuple (x, y)
+        v3 = (_ROBOT_LENGTH + FeetPositions[6], _ROBOT_WIDTH) # Leg 4 tuple (x, y)
     elif movingLeg == 2:
-        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
-        v2 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
-        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+        v1 = (0, 0) # Leg 1 tuple (x, y)
+        v2 = (_ROBOT_LENGTH + FeetPositions[4], 0) # Leg 3 tuple (x, y)
+        v3 = (_ROBOT_LENGTH + FeetPositions[6], _ROBOT_WIDTH) # Leg 4 tuple (x, y)
     elif movingLeg == 3:
-        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
-        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
-        v3 = (FeetPositions[6], FeetPositions[7]) # Leg 4 tuple (x, y)
+        v1 = (0, 0) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], _ROBOT_WIDTH) # Leg 2 tuple (x, y)
+        v3 = (_ROBOT_LENGTH + FeetPositions[6], _ROBOT_WIDTH) # Leg 4 tuple (x, y)
     elif movingLeg == 4:
-        v1 = (FeetPositions[0], FeetPositions[1]) # Leg 1 tuple (x, y)
-        v2 = (FeetPositions[2], FeetPositions[3]) # Leg 2 tuple (x, y)
-        v3 = (FeetPositions[4], FeetPositions[5]) # Leg 3 tuple (x, y)
+        v1 = (0, 0) # Leg 1 tuple (x, y)
+        v2 = (FeetPositions[2], _ROBOT_WIDTH) # Leg 2 tuple (x, y)
+        v3 = (_ROBOT_LENGTH + FeetPositions[4], 0) # Leg 3 tuple (x, y)
     else:
         print("Choose one of the 4 legs that's moving (movingLeg should equal 1 through 4)")
 
@@ -287,9 +287,7 @@ threshold = 1
 # Compute target_cog using initial joint angles
 initFeetPositions = ForwardKinematics(joint_angles)
 
-# This function not currently working; what frame is it in?
-#target_cog = GetTargetCg(initFeetPositions, movingLeg)
-target_cog = (6.0, 3.0)
+target_cog = GetTargetCg(initFeetPositions, movingLeg)
 
 print("\nThe target COG is: ", target_cog, "\n")
 
