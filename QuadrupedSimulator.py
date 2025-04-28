@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 import math
+from Plotter import plotter2d, plotCoG, plandrw
 
 _ROBOT_WIDTH = 8 # inches
 _ROBOT_LENGTH = 15
