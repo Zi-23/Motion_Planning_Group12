@@ -284,7 +284,7 @@ minimum_cogs = [] # center of gravity location
 leg_positions = [] # set of leg positions
 movingLeg = 1
 movingToTargetCG = True
-threshold = 1
+threshold = 0.01
 
 # Compute target_cog using initial joint angles
 initFeetPositions = ForwardKinematics(joint_angles)
