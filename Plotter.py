@@ -32,14 +32,17 @@ def plotCoG(CoG):
     CoG_i.append(CoG)
 
 def plandrw():
-    ## adds lines for the cogs for the final path
-    for i in range(CoG_i - 1):
-        p_1 = CoG_i[i]]
-        p_2 = CoG_i[CoG_i+1]]
+    ## Adds lines for the cogs for the final path
+    
+    for i in range(len(CoG_i) - 1):
+        p_1 = CoG_i[i]
+        p_2 = CoG_i[i + 1]
         plt.plot([p_1[0], p_2[0]], [p_1[1], p_2[1]], 'g-', linewidth=1)
         plt.plot(p_1[0], p_1[1], 'o', markersize=6, markeredgecolor='g', markerfacecolor='none')
+    
+    # Plot the last point
+    p_2 = CoG_i[-1]
     plt.plot(p_2[0], p_2[1], 'o', markersize=6, markeredgecolor='g', markerfacecolor='none')
-
 
 
 
