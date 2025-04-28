@@ -18,3 +18,10 @@
 &emsp; &emsp; - Plug each new COG into cost function (current COG - target COG)^2\
 &emsp; &emsp; - Select lowest cost and add to minimum cost function array.\
 &emsp; - Once the current COG is within a range around the target COG, plot path and move the robot.
+
+## Results
+### Threshold = 1
+![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/895ce2a9f00716a7a2e42dff2a2df886daa95509/COG_Plot_Threshold_1.png?raw=true)
+
+### Threshold = 0.01
+![alt text](https://github.com/Zi-23/Motion_Planning_Group12/blob/895ce2a9f00716a7a2e42dff2a2df886daa95509/COG_Plot_Threshold_0_01.png?raw=true)
