@@ -31,7 +31,7 @@ def plotCoG(CoG):
     plt.plot(CoG[0], CoG[1], 'ro', markersize=5)
     CoG_i.append(CoG)
 
-def plandrw(index):
+def plandrw():
     ## adds lines for the cogs for the final path
     for i in range(CoG_i - 1):
         p_1 = CoG_i[i]]
