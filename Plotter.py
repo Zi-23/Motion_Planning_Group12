@@ -12,7 +12,7 @@ def plotter2d(movingLeg, target_cog):
     plt.grid(True)
     plt.axis('equal')
 
-    FeetPositions = [(0, 0), (15, 0), (15, 8), (0, 8)]
+    FeetPositions = [(0, 0), (30, 0), (30, 8), (0, 8)]
 
     for i in range(4):
         plt.plot(FeetPositions[i][0], FeetPositions[i][1], 'ko', markersize=8, markerfacecolor='k')
