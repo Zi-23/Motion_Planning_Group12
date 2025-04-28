@@ -299,6 +299,7 @@ while movingToTargetCG == True:
 
     # Test each move to see which results in the most improvement; return that one
     min_joint, min_joint_index, min_cog = FindMinCostJoint(new_joint_angles, target_cog, joint_angles)
+    plotCoG(min_cog):
     print("Min COG: ", min_cog, "\n")
     print("Vs Target: ", target_cog, "\n")
 
@@ -308,7 +309,7 @@ while movingToTargetCG == True:
     # Add new minimum center of gravity, associated leg positions to an array for future plotting
     minimum_cogs.append(min_cog)
     leg_positions.append(joint_angles)
-
+    
     if target_cog[0] - threshold < min_cog[0] and min_cog[0] < target_cog[0] + threshold and target_cog[1] - threshold < min_cog[1] and min_cog[1] < target_cog[1] + threshold:
         movingToTargetCG = False
 
